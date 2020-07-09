@@ -1,0 +1,19 @@
+.card {
+  padding: 1rem;
+  border: #000 1px solid;
+  margin: 0.7rem 0;
+  width: 150px;
+}
+
+.round-img {
+  border-radius: 50%;
+}
+
+.center-container {
+  width: 80%;
+  margin: auto;
+}
+
+.text-center {
+  text-align: center;
+}
