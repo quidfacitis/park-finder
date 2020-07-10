@@ -1,74 +1,71 @@
-import React, { Fragment, Component } from 'react';
+import React, { Fragment, useEffect, useState, useContext } from 'react';
 import Spinner from '../layout/Spinner';
 import npsIcon from './img/nps_icon.png'
-// import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import ParkContext from '../../context/park/parkContext';
+// import PropTypes from 'prop-types';
 
-class Park extends Component {
+const Park = ({ match }) => {
+  const parkContext = useContext(ParkContext);
+  const { getPark, getParkAlerts, park, loading, parkCost, parkImgUrl } = parkContext;
 
-  state = {
-    imgLoading: true,
-    style: {
-       width: '150px',
-       height: '150px',
-       margin: 'auto',
-       display: 'none'
-    }
-  }
+  const [imgLoading, setImgLoading] = useState(true);
+  const [style, setStyle] = useState({
+    width: '150px',
+    height: '150px',
+    margin: 'auto',
+    display: 'none'
+  });
 
-  componentDidMount() {
-    this.props.getPark(this.props.match.params.parkcode);
-    this.props.getParkAlerts(this.props.match.params.parkcode);
-  }
+  useEffect(() => {
+    getPark(match.params.parkcode);
+    getParkAlerts(match.params.parkcode);
+    // eslint-disable-next-line
+  }, []); // The empty brackets are used to mimic "componentDidMount()"
 
-  onLoadParkImg = () => {
-    this.setState({
-      imgLoading: false,
-      style: {
-         width: '150px',
-         height: '150px',
-         margin: 'auto',
-         display: 'inline-block'
-      }
+
+  const onLoadParkImg = () => {
+    setImgLoading(false);
+    setStyle({
+      width: '150px',
+      height: '150px',
+      margin: 'auto',
+      display: 'inline-block'
     });
   }
 
-  onLoadDefaultImg = () => {
-    this.setState({ loading: false });
+  const onLoadDefaultImg = () => {
+    setImgLoading(false);
   }
 
-  render() {
+  const {
+    description,
+    directionsInfo,
+    fullName,
+    url,
+    weatherInfo
+  } = park;
 
-      const {
-        description,
-        directionsInfo,
-        fullName,
-        url,
-        weatherInfo
-      } = this.props.park;
 
-      const { loading, parkCost, parkImgUrl } = this.props;
+  if (loading) return <Spinner />;
 
-      if (loading) return <Spinner />;
+  return (
+    <Fragment>
+      <Link to="/">Back to search</Link>
+      <div>
+        <h2>{fullName}</h2>
+        <a href={url} target="_blank">Visit park website</a>
+        {parkCost && <p>Entrance fee: {parkCost}</p>}
+        <p>Directions: {directionsInfo}</p>
+        <p>Weather: {weatherInfo}</p>
 
-      return (
-        <Fragment>
-          <Link to="/">Back to search</Link>
-          <div>
-            <h2>{fullName}</h2>
-            <a href={url} target="_blank">Visit park website</a>
-            {parkCost && <p>Entrance fee: {parkCost}</p>}
-            <p>Directions: {directionsInfo}</p>
-            <p>Weather: {weatherInfo}</p>
-
-            <p>{description}</p>
-            {parkImgUrl ? <img src={parkImgUrl} className="round-img" alt="" style={this.state.style} onLoad={this.onLoadParkImg}/> :
-            <img src={npsIcon} className="round-img" alt="" style={{ width: '150px', height: '150px' }} onLoad={this.onLoadDefaultImg}/>}
-            {this.state.imgLoading && <Spinner />}
-          </div>
-        </Fragment>
-      )
-    }
+        <p>{description}</p>
+        {parkImgUrl ? <img src={parkImgUrl} className="round-img" alt="" style={style} onLoad={onLoadParkImg}/> :
+        <img src={npsIcon} className="round-img" alt="" style={{ width: '150px', height: '150px' }} onLoad={onLoadDefaultImg}/>}
+        {imgLoading && <Spinner />}
+      </div>
+    </Fragment>
+  )
 }
 
 export default Park;
